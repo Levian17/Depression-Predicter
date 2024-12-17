@@ -8,16 +8,16 @@ app.title('Depression Predicter')
 
 # Variables basicas de la logica
 respuestas: dict = {
-    'gender': 0,
-    'age': 'Age',
-    'study hours': 'Study Hours',
-    'academic pressure': 0,
-    'financial stress': 0,
-    'study satisfaction': 0,
-    'sleep duration': 0,
-    'dietary habits': 0,
-    'suicidal thouthts': False,
-    'family background': False,
+    'gender': None,
+    'age': None,
+    'study hours': None,
+    'academic pressure': None,
+    'financial stress': None,
+    'study satisfaction': None,
+    'sleep duration': None,
+    'dietary habits': None,
+    'suicidal thouthts': None,
+    'family background': None,
 }
 
 texto_resultado = StringVar()
@@ -26,44 +26,32 @@ texto_financial = StringVar()
 texto_satisfaction = StringVar()
 
 # Funciones de los widgets
-def ready_answers(respuestas: dict) -> bool:
-    for key in respuestas.keys():
-        if respuestas[key] == 0:
-            return False
-    return 'normal'
-
-def on_entry_age_change(value):
-    respuestas['age'] = value
-
-def on_checkbox_family_change(value):
-    print(value)
-
-def on_checkbox_suicidal_change(value):
-    print(value)
-
 def on_combo_change_gender(value):
-    print(value)
+    respuestas['gender'] = value
 
 def on_combo_change_diet(value):
-    print(value)
+    respuestas['dietary habits'] = value
 
 def on_combo_change_sleep(value):
-    print(value)
+    respuestas['sleep duration'] = value
 
 def on_slider_change_academic(value):
     texto_academic.set(int(value))
+    respuestas['academic pressure'] = value
 
 def on_slider_change_financial(value):
     texto_financial.set(int(value))
+    respuestas['financial stress'] = value
 
 def on_slider_change_satisfaction(value):
     texto_satisfaction.set(int(value))
+    respuestas['study satisfaction'] = value
 
 # Definimos los widgets
 entry_age = CTkEntry(app, justify='center',
                      width=60, height=40,
                      border_color='#555555',
-                     placeholder_text='Age', placeholder_text_color='#FFFFFF'
+                     placeholder_text='Age', placeholder_text_color='#FFFFFF',
                      )
 entry_study = CTkEntry(app, justify='center',
                      width=100, height=40,
@@ -71,10 +59,10 @@ entry_study = CTkEntry(app, justify='center',
                      placeholder_text='Study Hours', placeholder_text_color='#FFFFFF'
                      )
 checkbox_family_history = CTkCheckBox(app, text='Family depression history?',
-                                      border_width=1, checkmark_color='#92ba41', fg_color='#555555',
+                                      border_width=1.5, checkmark_color='#92ba41', fg_color='#555555',
                                       border_color='#92ba41', hover_color='#555555')
 checkbox_suicidal_thoughts = CTkCheckBox(app, text='Has had suicidal thoughts?',
-                                        border_width=1, checkmark_color='#92ba41', fg_color='#555555',
+                                        border_width=1.5, checkmark_color='#92ba41', fg_color='#555555',
                                         border_color='#92ba41', hover_color='#555555')
 
 combo_gender = CTkComboBox(app, values=['Male', 'Female'], justify='center',
@@ -150,12 +138,41 @@ label_satisfaction_res = CTkLabel(
 frame_resultados = CTkFrame(app, width=WIDTH * 1.1, height=HEIGTH * 0.15, 
                             border_color='#555555', border_width=1
                             )
-bttn_calcular = CTkButton(frame_resultados, text='Calculate Results', state=ready_answers(respuestas),
+
+# Logica calculo de resultados
+def ready_answers(respuestas: dict) -> bool:
+    for key in respuestas.keys():
+        if respuestas[key] == None:
+            print(respuestas.values())
+            return False
+    return True
+
+def calcular() -> None: 
+    age: str = entry_age.get()
+    study: str = entry_study.get()
+    if age.isnumeric():
+        respuestas['age'] = int(age)
+    else:
+        texto_resultado.set('Age must be a number.')
+    if study.isnumeric():
+        respuestas['study hours'] = int(study)
+    else:
+        texto_resultado.set('Age must be a number.')
+    respuestas['suicidal thouthts'] = bool(checkbox_suicidal_thoughts.get())
+    respuestas['family background'] = bool(checkbox_family_history.get())
+
+    if ready_answers(respuestas):
+        texto_resultado.set('Tu resultado.') 
+    else:
+        texto_resultado.set('Error on the data inputs.')
+
+bttn_calcular = CTkButton(frame_resultados, text='Calculate Results',
                           height=40, width=150,
+                          command=calcular,
                           text_color='#000000', fg_color='#92ba41', hover_color='#f59425',
                           border_color='#555555', border_width=1,
                           )
-label_resultado = CTkLabel(frame_resultados, text=texto_resultado)
+label_resultado = CTkLabel(frame_resultados, textvariable=texto_resultado)
 
 
 # Desplegamos los widgets
@@ -186,7 +203,7 @@ checkbox_suicidal_thoughts.place(x=275, y=HEIGTH * 0.55)
 
 frame_resultados.place(x= WIDTH * 0.05, y= HEIGTH * 0.65)
 bttn_calcular.place(x=25, y=25)
-label_resultado.place(x = 300, y = 30)
+label_resultado.place(x = 250, y = 30)
 
 # Lanzamos la interfaz
 app.mainloop()
