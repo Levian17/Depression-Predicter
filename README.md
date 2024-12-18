@@ -6,11 +6,14 @@ Currently in development.
 ## Project Structure
 ```
 Depression-Predicter
+│   LICENSE.txt
 │   main.py
 │   README.md
+│   requirements.txt
 │
 ├───data
-│       data_visualization.ipynb
+│       data_visualization_english.ipynb
+│       data_visualization_spanish.ipynb
 │       Student Depression Dataset.csv
 │
 ├───model_files
@@ -21,5 +24,4 @@ Depression-Predicter
 └───src
         GUI.py
         model_definition.py
-        pruebas.py
 ```
