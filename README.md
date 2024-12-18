@@ -10,8 +10,6 @@ The dataset is included in the project in the data directory 'data/Student Depre
 
 ![screenshot](images/dataset_head.png)
 
-![screenshot](images/correlation.png)
-
 ## Project Structure
 ```
 Depression-Predicter
