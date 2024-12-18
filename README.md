@@ -57,7 +57,7 @@ Once the interface is displayed, the user has to insert values into the necessar
 ![screenshot](images/interface_preview.png)
 
 ## Current problems and future implementations
-Force the age to be between 18 and 34, the AI model doesn't have enough data outside of that value and the output losses accuracy.
+Force the age to be between 18 and 34, the AI model doesn't have enough data outside of that value range and the output losses accuracy.
 
 ## License
 This project is under the Creative Commons Attribution-NonCommercial 4.0 International License
