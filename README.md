@@ -23,6 +23,10 @@ Depression-Predicter
 │       data_visualization_spanish.ipynb
 │       Student Depression Dataset.csv
 │
+├───images
+│       dataset_head.png
+│       interface_preview.png
+│
 ├───model_files
 │       depression_model.pth
 │       encoder.joblib
