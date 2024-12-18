@@ -3,7 +3,7 @@ Tool that takes the data and makes predictions of depression probability based o
 
 Currently in development.
 
-### Project Structure
+## Project Structure
 ---
 ```
 Depression-Predicter
