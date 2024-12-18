@@ -138,12 +138,12 @@ label_satisfaction_res = CTkLabel(
 frame_resultados = CTkFrame(app, width=WIDTH * 1.1, height=HEIGTH * 0.15, 
                             border_color='#555555', border_width=1
                             )
+label_resultado = CTkLabel(frame_resultados, textvariable=texto_resultado)
 
-# Logica calculo de resultados
+# Logica calculo de resultados (Necesita los widgets previos y ser declarada antes que el boton)
 def ready_answers(respuestas: dict) -> bool:
     for key in respuestas.keys():
         if respuestas[key] == None:
-            print(respuestas.values())
             return False
     return True
 
@@ -161,18 +161,17 @@ def calcular() -> None:
     respuestas['suicidal thouthts'] = bool(checkbox_suicidal_thoughts.get())
     respuestas['family background'] = bool(checkbox_family_history.get())
 
+    print(respuestas.values())
     if ready_answers(respuestas):
         texto_resultado.set('Tu resultado.') 
     else:
         texto_resultado.set('Error on the data inputs.')
 
 bttn_calcular = CTkButton(frame_resultados, text='Calculate Results',
-                          height=40, width=150,
+                          height=40, width=150, border_width=1,
                           command=calcular,
-                          text_color='#000000', fg_color='#92ba41', hover_color='#f59425',
-                          border_color='#555555', border_width=1,
+                          text_color='#000000', fg_color='#92ba41', hover_color='#f59425', border_color='#555555', 
                           )
-label_resultado = CTkLabel(frame_resultados, textvariable=texto_resultado)
 
 
 # Desplegamos los widgets
