@@ -6,6 +6,7 @@ Currently in development.
 ### Project Structure
 ---
 ```
+Depression-Predicter
 │   main.py
 │   README.md
 │   to_do.txt
