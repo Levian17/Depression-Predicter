@@ -6,7 +6,6 @@ Currently in development.
 ### Project Structure
 ---
 ```
-Depression-Predicter
 │   main.py
 │   README.md
 │   to_do.txt
@@ -16,6 +15,10 @@ Depression-Predicter
 │       Student Depression Dataset.csv
 │
 ├───model_files
+│       depression_model.pth
+│       encoder.joblib
+│       scaler.joblib
+│
 └───src
         GUI.py
         model_definition.py
