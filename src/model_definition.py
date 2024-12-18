@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import pandas as pd
 import numpy as np
 import joblib
@@ -9,21 +8,22 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from torch.utils.data import Dataset, DataLoader
 
+# Definimos la estructura da la red neuronal
 class DepressionModel(nn.Module):
     def __init__(self, input_size):
         super(DepressionModel, self).__init__()
         self.fc1 = nn.Linear(input_size, 64)  # Primera capa
         self.fc2 = nn.Linear(64, 32)          # Segunda capa
         self.fc3 = nn.Linear(32, 2)           # Capa de salida (clasificación binaria)
-        self.relu = nn.ReLU()
         
     def forward(self, x):
-        x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.fc1(x)   # Aplicar ReLU a la capa 1
+        x = F.relu(self.fc2(x))   # Aplicar ReLU a la capa 2
+        x = self.fc3(x)   # Aplicar la capa de salida
         return F.softmax(x, dim=1)  # Retorna las probabilidades para cada clase
 
-def train_model():
+# Definimos la funcion de entrenamiento
+def train_and_export_model():
     # Cargamos la data del archivo csv y filtramos las columnas que queremos
     df = pd.read_csv('data/Student Depression Dataset.csv')
     columns_to_keep = ['Gender', 'Age', 'Work/Study Hours', 'Academic Pressure', 'Financial Stress', 'Study Satisfaction', 'Sleep Duration', 'Dietary Habits', 'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness', 'Depression']
@@ -41,13 +41,13 @@ def train_model():
     # Aplicamos One-hot encoding a las columnas categóricas
     encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
     encoder.fit(X[categorical_cols])
-    joblib.dump(encoder, 'encoder.joblib')
+    joblib.dump(encoder, 'model_files/encoder.joblib')
     encoded_cat_data = encoder.fit_transform(X[categorical_cols])
 
     # Estandarizamos los datos numéricos
     scaler = StandardScaler()
     scaler.fit(X[numerical_cols])
-    joblib.dump(scaler, 'scaler.joblib')
+    joblib.dump(scaler, 'model_files/scaler.joblib')
     scaled_num_data = scaler.fit_transform(X[numerical_cols])
 
     # Unimos los datos procesados
@@ -56,7 +56,7 @@ def train_model():
     # Realizamos la división en entrenamiento y prueba con un 20% para prueba
     X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=17)
 
-    # 2. Creamos un Dataset de PyTorch
+    # Creamos un Dataset de PyTorch
     class DepressionDataset(Dataset):
         def __init__(self, X, y):
             self.X = torch.tensor(X, dtype=torch.float32)
@@ -75,11 +75,11 @@ def train_model():
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    # 3. Inicializamos el modelo
+    # Inicializamos el modelo
     input_size = X_train.shape[1]  # Número de características en el dataset procesado
     model = DepressionModel(input_size)
 
-    # 4. Entrenamos el modelo
+    # Entrenamos el modelo
     criterion = nn.CrossEntropyLoss()  # Para clasificación binaria
     optimizer = torch.optim.SGD(params=model.parameters(), 
                                 lr=0.1)
@@ -107,7 +107,7 @@ def train_model():
 
         print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}, Accuracy: {100 * correct / total:.2f}%")
 
-    # 5. Evaluamos el modelo
+    # Evaluamos el modelo
     model.eval()  # Ponemos el modelo en modo evaluación
     correct = 0
     total = 0
@@ -121,6 +121,8 @@ def train_model():
 
     print(f"Precisión en prueba: {100 * correct / total:.2f}%")
 
-    # 7. Exportamos el modelo
+    # Exportamos el modelo
     torch.save(model.state_dict(), 'model_files/depression_model.pth')
 
+def predict():
+    pass
