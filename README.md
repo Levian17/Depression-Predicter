@@ -55,5 +55,9 @@ The main file allows the user to display the interface or to train and save the 
 Once the interface is displayed, the user has to insert values into the necessary widgets. Once all data has been inserted, clicking the Calculate Results button will pass the data to the AI model, and the results will be displayed on the screen.
 
 ![screenshot](images/interface_preview.png)
+
+## Current problems and future implementations
+Force the age to be between 18 and 34, the AI model doesn't have enough data outside of that value and the output losses accuracy.
+
 ## License
 This project is under the Creative Commons Attribution-NonCommercial 4.0 International License
