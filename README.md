@@ -8,6 +8,8 @@ The dataset is explored in the 'data/data_visualization_english.ipynb' and 'data
 
 The dataset is included in the project in the data directory 'data/Student Depression Dataset.csv'. To learn more about it, check out [Kaggle](https://www.kaggle.com/datasets/hopesb/student-depression-dataset).
 
+!(images/dataset_head.png)
+
 ## Project Structure
 ```
 Depression-Predicter
