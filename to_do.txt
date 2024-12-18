@@ -1,9 +1,0 @@
-actualizar el readme
-
-desarrollar funcion de exportado
-
-exportar el modelo
-
-sincronizar el modelo exportado con el boton calcular en la GUI
-
-refactorizar la estructura del proyecto
