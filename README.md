@@ -4,7 +4,6 @@ Tool that takes the data and makes predictions of depression probability based o
 Currently in development.
 
 ## Project Structure
----
 ```
 Depression-Predicter
 │   main.py
