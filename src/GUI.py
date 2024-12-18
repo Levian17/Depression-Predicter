@@ -1,4 +1,5 @@
 from customtkinter import *
+from src.model_definition import predict
 
 def initialize():
     # Definimos los basicos del frame
@@ -9,16 +10,16 @@ def initialize():
 
     # Variables basicas de la logica
     respuestas: dict = {
-        'gender': None,
-        'age': None,
-        'study hours': None,
-        'academic pressure': None,
-        'financial stress': None,
-        'study satisfaction': None,
-        'sleep duration': None,
-        'dietary habits': None,
-        'suicidal thouthts': None,
-        'family background': None,
+        'Gender': [None],
+        'Age': [None],
+        'Work/Study Hours': [None],
+        'Academic Pressure': [None],
+        'Financial Stress': [None],
+        'Study Satisfaction': [None],
+        'Sleep Duration': [None],
+        'Dietary Habits': [None],
+        'Have you ever had suicidal thoughts ?': [None],
+        'Family History of Mental Illness': [None],
     }
 
     texto_resultado = StringVar()
@@ -28,25 +29,25 @@ def initialize():
 
     # Funciones de los widgets
     def on_combo_change_gender(value):
-        respuestas['gender'] = value
+        respuestas['Gender'][0] = value
 
     def on_combo_change_diet(value):
-        respuestas['dietary habits'] = value
+        respuestas['Dietary Habits'][0] = value
 
     def on_combo_change_sleep(value):
-        respuestas['sleep duration'] = value
+        respuestas['Sleep Duration'][0] = value
 
     def on_slider_change_academic(value):
         texto_academic.set(int(value))
-        respuestas['academic pressure'] = value
+        respuestas['Academic Pressure'][0] = value
 
     def on_slider_change_financial(value):
         texto_financial.set(int(value))
-        respuestas['financial stress'] = value
+        respuestas['Financial Stress'][0] = value
 
     def on_slider_change_satisfaction(value):
         texto_satisfaction.set(int(value))
-        respuestas['study satisfaction'] = value
+        respuestas['Study Satisfaction'][0] = value
 
     # Definimos los widgets
     entry_age = CTkEntry(app, justify='center',
@@ -152,19 +153,25 @@ def initialize():
         age: str = entry_age.get()
         study: str = entry_study.get()
         if age.isnumeric():
-            respuestas['age'] = int(age)
+            respuestas['Age'][0] = float(int(age))
         else:
             texto_resultado.set('Age must be a number.')
         if study.isnumeric():
-            respuestas['study hours'] = int(study)
+            respuestas['Work/Study Hours'][0] = float(int(study))
         else:
             texto_resultado.set('Age must be a number.')
-        respuestas['suicidal thouthts'] = bool(checkbox_suicidal_thoughts.get())
-        respuestas['family background'] = bool(checkbox_family_history.get())
+        if bool(checkbox_suicidal_thoughts.get()):
+            respuestas['Have you ever had suicidal thoughts ?'][0] = 'Yes'
+        else:
+            respuestas['Have you ever had suicidal thoughts ?'][0] = 'No'
+        if bool(checkbox_family_history.get()):
+            respuestas['Family History of Mental Illness'][0] = 'Yes'
+        else:
+            respuestas['Family History of Mental Illness'][0] = 'No'
 
         print(respuestas.values())
         if ready_answers(respuestas):
-            texto_resultado.set('Tu resultado.') 
+            texto_resultado.set(f'Probability of having depression:  {'%.2f' % (predict(respuestas)*100)}%')
         else:
             texto_resultado.set('Error on the data inputs.')
 

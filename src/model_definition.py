@@ -1,12 +1,13 @@
-import torch
-import torch.nn as nn
 import pandas as pd
 import numpy as np
 import joblib
+import torch
+import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from torch.utils.data import Dataset, DataLoader
+
 
 # Definimos la estructura da la red neuronal
 class DepressionModel(nn.Module):
@@ -21,12 +22,27 @@ class DepressionModel(nn.Module):
         x = F.relu(self.fc2(x))   # Aplicar ReLU a la capa 2
         x = self.fc3(x)   # Aplicar la capa de salida
         return F.softmax(x, dim=1)  # Retorna las probabilidades para cada clase
+    
+# Creamos un Dataset de PyTorch
+class DepressionDataset(Dataset):
+    def __init__(self, X, y):
+        self.X = torch.tensor(X, dtype=torch.float32)
+        self.y = torch.tensor(y.values, dtype=torch.long)
+
+    def __len__(self):
+        return len(self.X)
+        
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx]
 
 # Definimos la funcion de entrenamiento
 def train_and_export_model():
     # Cargamos la data del archivo csv y filtramos las columnas que queremos
     df = pd.read_csv('data/Student Depression Dataset.csv')
-    columns_to_keep = ['Gender', 'Age', 'Work/Study Hours', 'Academic Pressure', 'Financial Stress', 'Study Satisfaction', 'Sleep Duration', 'Dietary Habits', 'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness', 'Depression']
+    columns_to_keep = ['Gender', 'Age', 'Work/Study Hours', 'Academic Pressure',
+                      'Financial Stress', 'Study Satisfaction', 'Sleep Duration',
+                      'Dietary Habits', 'Have you ever had suicidal thoughts ?',
+                      'Family History of Mental Illness', 'Depression']
     df = df[columns_to_keep]
     df = df.dropna()
 
@@ -56,27 +72,21 @@ def train_and_export_model():
     # Realizamos la división en entrenamiento y prueba con un 20% para prueba
     X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=17)
 
-    # Creamos un Dataset de PyTorch
-    class DepressionDataset(Dataset):
-        def __init__(self, X, y):
-            self.X = torch.tensor(X, dtype=torch.float32)
-            self.y = torch.tensor(y.values, dtype=torch.long)
+    # Torcheamos la data, tensorizacion
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train.values, dtype=torch.long)
+    X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+    y_test_tensor = torch.tensor(y_test.values, dtype=torch.long)
 
-        def __len__(self):
-            return len(self.X)
-        
-        def __getitem__(self, idx):
-            return self.X[idx], self.y[idx]
-
-    # Creamos los DataLoader para el batching
-    train_dataset = DepressionDataset(X_train, y_train)
-    test_dataset = DepressionDataset(X_test, y_test)
-
+    # Creamos el data loader
+    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+    test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
     # Inicializamos el modelo
     input_size = X_train.shape[1]  # Número de características en el dataset procesado
+    print(input_size)
     model = DepressionModel(input_size)
 
     # Entrenamos el modelo
@@ -124,5 +134,51 @@ def train_and_export_model():
     # Exportamos el modelo
     torch.save(model.state_dict(), 'model_files/depression_model.pth')
 
-def predict():
-    pass
+def predict(respuestas: dict) -> float:
+
+    # Convertimos respuestas en un dataframe
+    df = pd.DataFrame.from_dict(respuestas)
+
+    # Cargamos nuestros modelo, encoder y escaler que guardamos durante el entrenamiento
+    encoder = joblib.load('model_files/encoder.joblib')
+    scaler = joblib.load('model_files/scaler.joblib')
+    model = DepressionModel(input_size=20)
+    model.load_state_dict(torch.load('model_files/depression_model.pth'))
+    model.eval()
+
+    print(df.dtypes)
+
+    # Separamos las columnas categóricas de las columnas numéricas
+    categorical_cols = df.select_dtypes(include=['object']).columns
+    numerical_cols = df.select_dtypes(include=['float64']).columns
+
+    # Separamos las columnas categóricas de las columnas numéricas
+    categorical_cols = df.select_dtypes(include=['object']).columns
+    numerical_cols = df.select_dtypes(include=['float64']).columns
+
+    
+    # Aplicamos One-hot encoding a las columnas categóricas utilizando el encoder cargado
+    encoded_cat_data = encoder.transform(df[categorical_cols])
+
+    # Estandarizamos los datos numéricos utilizando el scaler cargado
+    scaled_num_data = scaler.transform(df[numerical_cols])
+
+    # Unimos los datos procesados
+    df_processed = np.hstack((encoded_cat_data, scaled_num_data)) 
+
+    torched_data = torch.tensor(df_processed, dtype=torch.float32)
+    with torch.no_grad():
+        output = model(torched_data)
+
+    depression_probability = output[:, 1].item()
+
+    return depression_probability
+
+
+
+
+
+
+
+
+
