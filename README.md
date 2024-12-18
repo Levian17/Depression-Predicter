@@ -1,11 +1,11 @@
-# Depression-Predicter
+## Description
 Tool that takes the data and makes predictions of depression probability based on an AI model trained over the dataset "Student Depression".
 
 Currently in development.
 
 ### Project Structure
 ---
-
+```
 Depression-Predicter
 │   main.py
 │   README.md
@@ -20,3 +20,4 @@ Depression-Predicter
         GUI.py
         model_definition.py
         pruebas.py
+```
