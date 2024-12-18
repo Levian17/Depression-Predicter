@@ -9,7 +9,6 @@ Currently in development.
 Depression-Predicter
 │   main.py
 │   README.md
-│   to_do.txt
 │
 ├───data
 │       data_visualization.ipynb
